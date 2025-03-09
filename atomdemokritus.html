@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atom Demokritus</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: url('https://images.unsplash.com/photo-1462332420958-a05d1e002413') no-repeat center center fixed;
+            background-size: cover;
+            overflow: hidden;
+            position: relative;
+        }
+        .atom {
+            width: 100px;
+            height: 100px;
+            background-color: steelblue;
+            border-radius: 50%;
+            position: absolute;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            animation: glow 1s infinite alternate;
+        }
+        .atom:hover {
+            transform: scale(1.2);
+            background-color: dodgerblue;
+        }
+        @keyframes glow {
+            0% { box-shadow: 0 0 10px rgba(255, 255, 255, 0.5); }
+            100% { box-shadow: 0 0 20px rgba(255, 255, 255, 1); }
+        }
+        @keyframes explode {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+        .particle {
+            width: 10px;
+            height: 10px;
+            background: radial-gradient(circle, orange, red, transparent);
+            position: absolute;
+            border-radius: 50%;
+            animation: explode 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <audio id="popSound" preload="auto">
+        <source src="https://www.fesliyanstudios.com/play-mp3/2199" type="audio/mp3">
+        Your browser does not support the audio element.
+    </audio>
+    <div class="atom" id="atom">Pecahin Aku!</div>
+    <script>
+        document.getElementById("popSound").volume = 1.0;
+        document.body.addEventListener("click", () => {
+            document.getElementById("popSound").play().catch(e => console.log("Sound autoplay blocked, user interaction required!"));
+        }, { once: true });
+
+        function createParticles(x, y) {
+            for (let i = 0; i < 6; i++) {
+                let particle = document.createElement("div");
+                particle.classList.add("particle");
+                particle.style.left = `${x + (Math.random() * 40 - 20)}px`;
+                particle.style.top = `${y + (Math.random() * 40 - 20)}px`;
+                document.body.appendChild(particle);
+                setTimeout(() => particle.remove(), 500);
+            }
+        }
+        
+        document.getElementById("atom").addEventListener("click", function splitAtom() {
+            let atom = this;
+            let size = parseInt(window.getComputedStyle(atom).width);
+            let sound = document.getElementById("popSound");
+            sound.currentTime = 0;
+            sound.play();
+            createParticles(atom.offsetLeft, atom.offsetTop);
+            
+            if (size > 10) {
+                atom.remove();
+                for (let i = 0; i < 2; i++) {
+                    let newAtom = document.createElement("div");
+                    newAtom.classList.add("atom");
+                    newAtom.style.width = size / 2 + "px";
+                    newAtom.style.height = size / 2 + "px";
+                    newAtom.style.left = Math.random() * (window.innerWidth - size) + "px";
+                    newAtom.style.top = Math.random() * (window.innerHeight - size) + "px";
+                    newAtom.textContent = "Pecahin Aku!";
+                    document.body.appendChild(newAtom);
+                    newAtom.addEventListener("click", splitAtom);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
